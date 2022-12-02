@@ -1,9 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-src/__init__.py
-src/cache.py
-src/memoiz.egg-info/PKG-INFO
-src/memoiz.egg-info/SOURCES.txt
-src/memoiz.egg-info/dependency_links.txt
-src/memoiz.egg-info/top_level.txt
