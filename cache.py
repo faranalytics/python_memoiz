@@ -13,7 +13,7 @@ class Cache:
         del self._cache[fn][self.freeze((args, kwargs))]
 
     def freeze(self, it):
-        if it in self.immutables:
+        if type(it) in self.immutables:
             return it
         elif isinstance(it,(list, tuple)):
             return tuple(self.freeze(i) for i in it)
