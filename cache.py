@@ -25,6 +25,8 @@ class Cache:
         elif self.use_hash:
             hash(it)
             return it
+        else:
+            raise Exception(f"Cannot freeze {it}.")
 
     def __call__(self, fn):
 
