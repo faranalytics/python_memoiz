@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "memoiz"
-version = "0.0.1"
+version = "0.0.5"
 authors = [
   { name="Adam Patterson", email="adam@faranalytics.net" },
 ]
