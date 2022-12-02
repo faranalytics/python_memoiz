@@ -4,8 +4,8 @@ import logging
 
 class Cache:
 
-    def __init__(self, hashables=(int, float, bool, str, type(None)), use_hash=False):
-        self.use_hash = use_hash
+    def __init__(self, hashables=(int, float, bool, str, type(None)), allow_hash=False):
+        self.allow_hash = allow_hash
         self.hashables = hashables
         self._cache = {}
 
@@ -19,7 +19,7 @@ class Cache:
             return tuple(self.freeze(i) for i in it)
         elif isinstance(it, dict):
             return tuple((i[0], self.freeze(i[1])) for i in sorted(it.items(), key=lambda x: x[0]))
-        elif self.use_hash:
+        elif self.allow_hash:
             hash(it)
             return it
         else:
