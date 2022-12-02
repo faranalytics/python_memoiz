@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: memoiz
+Version: 0.0.1
+Summary: A small package
+Author-email: Adam Patterson <adam@faranalytics.net>
+Project-URL: Homepage, https://github.com/faranalytics/python_memoiz.git
+Project-URL: Bug Tracker, https://github.com/faranalytics/python_memoiz/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# python_memoiz
