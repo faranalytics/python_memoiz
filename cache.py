@@ -1,10 +1,12 @@
 import inspect
 from functools import wraps
 import logging
+from typing import Tuple
+
 
 class Cache:
 
-    def __init__(self, immutables=(int, float, complex, bool, str, type(None)), allow_hash=True):
+    def __init__(self, immutables: Tuple[type, ...] = (int, float, complex, bool, str, type(None)), allow_hash: bool = True):
         self.allow_hash = allow_hash
         self.immutables = immutables
         self._cache = {}
@@ -15,7 +17,7 @@ class Cache:
     def freeze(self, it):
         if type(it) in self.immutables:
             return it
-        elif isinstance(it,(list, tuple)):
+        elif isinstance(it, (list, tuple)):
             return tuple(self.freeze(i) for i in it)
         elif isinstance(it, dict):
             return tuple((i[0], self.freeze(i[1])) for i in sorted(it.items(), key=lambda x: x[0]))
@@ -36,19 +38,19 @@ class Cache:
                     _fn = wrapper
 
                 hashable = self.freeze((args, kwargs))
-                
+
                 if _fn not in self._cache:
                     self._cache[_fn] = {}
 
                 if hashable not in self._cache[_fn]:
                     self._cache[_fn][hashable] = fn(*args, **kwargs)
                     logging.debug(f"Cached {(_fn, hashable)}.")
-                else:      
+                else:
                     logging.debug(f"Using cache for {(_fn, hashable)}.")
                     return self._cache[_fn][hashable]
 
             except Exception as e:
                 logging.debug(e)
                 return fn(*args, **kwargs)
-                
+
         return wrapper
