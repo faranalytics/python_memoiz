@@ -3,7 +3,6 @@ from functools import wraps
 import logging
 from typing import Tuple
 
-
 class Cache:
 
     def __init__(self, immutables: Tuple[type, ...] = (int, float, complex, bool, str, type(None)), allow_hash: bool = True):
