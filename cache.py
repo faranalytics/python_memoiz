@@ -4,16 +4,16 @@ import logging
 
 class Cache:
 
-    def __init__(self, use_hash=False, primitives=(int, float, bool, str, type(None))):
+    def __init__(self, use_hash=False, hashables=(int, float, bool, str, type(None))):
         self.use_hash = use_hash
-        self.primitives = primitives
+        self.hashables = hashables
         self._cache = {}
 
     def invalidate(self, fn, *args, **kwargs):
         del self._cache[fn][self.freeze((args, kwargs))]
 
     def freeze(self, it):
-        if it in self.primitives:
+        if it in self.hashables:
             return it
         elif isinstance(it,(list, tuple)):
             return tuple(self.freeze(i) for i in it)
