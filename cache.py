@@ -4,7 +4,7 @@ import logging
 
 class Cache:
 
-    def __init__(self, use_hash=False, hashables=(int, float, bool, str, type(None))):
+    def __init__(self, hashables=(int, float, bool, str, type(None)), use_hash=False):
         self.use_hash = use_hash
         self.hashables = hashables
         self._cache = {}
