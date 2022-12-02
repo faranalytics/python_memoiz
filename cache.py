@@ -8,7 +8,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 class Cache:
 
     def __init__(self, use_hash=False, primitives=(int, float, bool, str, type(None))):
-        self.user_hash = use_hash
+        self.use_hash = use_hash
         self.primitives = primitives
         self._cache = {}
 
