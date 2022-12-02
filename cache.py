@@ -1,9 +1,6 @@
 import inspect
 from functools import wraps
-from pprint import pprint
 import logging
-
-logging.getLogger().setLevel(logging.DEBUG)
 
 class Cache:
 
