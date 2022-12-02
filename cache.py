@@ -4,7 +4,7 @@ import logging
 
 class Cache:
 
-    def __init__(self, immutables=(int, float, complex, bool, str, type(None)), allow_hash=False):
+    def __init__(self, immutables=(int, float, complex, bool, str, type(None)), allow_hash=True):
         self.allow_hash = allow_hash
         self.immutables = immutables
         self._cache = {}
