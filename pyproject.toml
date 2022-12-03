@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "memoiz"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
   { name="Adam Patterson", email="adam@faranalytics.net" },
 ]
-description = "A small package"
+description = "Memoiz is a memoization decorator that makes resonable assumptions about how and if to cache the return value of a function or method based on the arguments passed to it. The decorator can be used on both free and bound functions."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
