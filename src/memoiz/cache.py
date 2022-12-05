@@ -44,9 +44,9 @@ class Cache:
                 if hashable not in self._cache[_fn]:
                     self._cache[_fn][hashable] = fn(*args, **kwargs)
                     logging.debug(f"Cached {(_fn, hashable)}.")
-                else:
-                    logging.debug(f"Using cache for {(_fn, hashable)}.")
-                    return self._cache[_fn][hashable]
+
+                logging.debug(f"Using cache for {(_fn, hashable)}.")
+                return self._cache[_fn][hashable]
 
             except Exception as e:
                 logging.debug(e)
