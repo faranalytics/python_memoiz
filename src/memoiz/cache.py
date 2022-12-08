@@ -3,6 +3,10 @@ from functools import wraps
 import logging
 from typing import Tuple
 
+class CacheException(Exception):
+     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 class Cache:
 
     def __init__(self, immutables: Tuple[type, ...] = (int, float, complex, bool, str, type(None)), allow_hash: bool = True):
@@ -21,10 +25,13 @@ class Cache:
         elif isinstance(it, dict):
             return tuple((i[0], self.freeze(i[1])) for i in sorted(it.items(), key=lambda x: x[0]))
         elif self.allow_hash:
-            hash(it)
+            try:
+                hash(it)
+            except Exception as e:
+                raise CacheException(f"Cannot freeze {it}.")
             return it
         else:
-            raise Exception(f"Cannot freeze {it}.")
+            raise CacheException(f"Cannot freeze {it}.")
 
     def __call__(self, fn):
 
@@ -48,7 +55,7 @@ class Cache:
                 logging.debug(f"Using cache for {(_fn, hashable)}.")
                 return self._cache[_fn][hashable]
 
-            except Exception as e:
+            except CacheException as e:
                 logging.debug(e)
                 return fn(*args, **kwargs)
 
