@@ -74,10 +74,10 @@ class Cache:
 
             except CacheException as e:
                 logging.debug(e)
-                self._lock.release()
                 return fn(*args, **kwargs)
             except BaseException as e:
-                self._lock.release()
+                if self._lock.locked():
+                    self._lock.release()
                 raise e
-                
+
         return wrapper
