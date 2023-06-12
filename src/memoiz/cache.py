@@ -14,12 +14,15 @@ class Cache:
         self.allow_hash = allow_hash
         self.immutables = immutables
         self._cache = {}
-
+        self._lock = threading.Lock()
+        
     def invalidate(self, fn, *args, **kwargs):
-        del self._cache[fn][self.freeze((args, kwargs))]
+        with self._lock:
+            del self._cache[fn][self.freeze((args, kwargs))]
 
     def invalidate_all(self):
-        self._cache = {}
+        with self._lock:
+            self._cache = {}
 
     def freeze(self, it):
         if type(it) in self.immutables:
@@ -45,25 +48,36 @@ class Cache:
                 if hasattr(args[0], fn.__name__) and inspect.unwrap(getattr(args[0], fn.__name__)) is fn:
                     # If the first argument is an object and it contains the method `fn` then use the unwrapped method (i.e., the bound function) for the key.
                     # This is necessary because the bound function is the reference that may be used for invalidation.
-                    key = getattr(args[0], fn.__name__)                    
+                    key = getattr(args[0], fn.__name__)            
                 else:
                     # If this is not a method call, then use the wrapper for the key.  This is necessary, as referencing the function will return the wrapper.
                     key = wrapper
 
                 hashable = self.freeze((args, kwargs))
 
-                if key not in self._cache:
-                    self._cache[key] = {}
+                if key in self._cache and hashable in self._cache[key]:
+                    logging.debug(f"Using cache for {(key, hashable)}.")
+                    self._lock.acquire()
+                    result = self._cache[key][hashable]
+                    self._lock.release()
+                else:
+                    result = fn(*args, **kwargs)
+                    self._lock.acquire()
+                    if key not in self._cache:
+                        self._cache[key] = {}
+                    if hashable not in self._cache[key]:
+                        self._cache[key][hashable] = result
+                        logging.debug(f"Cached {(key, hashable)}.")
+                    self._lock.release()
 
-                if hashable not in self._cache[key]:
-                    self._cache[key][hashable] = fn(*args, **kwargs)
-                    logging.debug(f"Cached {(key, hashable)}.")
-
-                logging.debug(f"Using cache for {(key, hashable)}.")
-                return self._cache[key][hashable]
+                return result
 
             except CacheException as e:
                 logging.debug(e)
+                self._lock.release()
                 return fn(*args, **kwargs)
-
+            except BaseException as e:
+                self._lock.release()
+                raise e
+                
         return wrapper
