@@ -1,4 +1,5 @@
 import inspect
+import threading
 from functools import wraps
 import logging
 from typing import Tuple
@@ -16,6 +17,9 @@ class Cache:
 
     def invalidate(self, fn, *args, **kwargs):
         del self._cache[fn][self.freeze((args, kwargs))]
+
+    def invalidate_all(self):
+        self._cache = {}
 
     def freeze(self, it):
         if type(it) in self.immutables:
@@ -39,21 +43,24 @@ class Cache:
         def wrapper(*args, **kwargs):
             try:
                 if hasattr(args[0], fn.__name__) and inspect.unwrap(getattr(args[0], fn.__name__)) is fn:
-                    _fn = getattr(args[0], fn.__name__)
+                    # If the first argument is an object and it contains the method `fn` then use the unwrapped method (i.e., the bound function) for the key.
+                    # This is necessary because the bound function is the reference that may be used for invalidation.
+                    key = getattr(args[0], fn.__name__)                    
                 else:
-                    _fn = wrapper
+                    # If this is not a method call, then use the wrapper for the key.  This is necessary, as referencing the function will return the wrapper.
+                    key = wrapper
 
                 hashable = self.freeze((args, kwargs))
 
-                if _fn not in self._cache:
-                    self._cache[_fn] = {}
+                if key not in self._cache:
+                    self._cache[key] = {}
 
-                if hashable not in self._cache[_fn]:
-                    self._cache[_fn][hashable] = fn(*args, **kwargs)
-                    logging.debug(f"Cached {(_fn, hashable)}.")
+                if hashable not in self._cache[key]:
+                    self._cache[key][hashable] = fn(*args, **kwargs)
+                    logging.debug(f"Cached {(key, hashable)}.")
 
-                logging.debug(f"Using cache for {(_fn, hashable)}.")
-                return self._cache[_fn][hashable]
+                logging.debug(f"Using cache for {(key, hashable)}.")
+                return self._cache[key][hashable]
 
             except CacheException as e:
                 logging.debug(e)
