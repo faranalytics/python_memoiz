@@ -1,5 +1,6 @@
 import inspect
 import threading
+import copy
 from functools import wraps
 import logging
 from typing import Tuple
@@ -10,8 +11,9 @@ class CacheException(Exception):
 
 class Cache:
 
-    def __init__(self, immutables: Tuple[type, ...] = (int, float, complex, bool, str, type(None)), allow_hash: bool = True):
+    def __init__(self, immutables: Tuple[type, ...] = (int, float, complex, bool, str, type(None)), allow_hash: bool = True, deep_copy: bool = True):
         self.allow_hash = allow_hash
+        self.deep_copy = deep_copy
         self.immutables = immutables
         self._cache = {}
         self._lock = threading.Lock()
@@ -70,7 +72,10 @@ class Cache:
                         logging.debug(f"Cached {(key, hashable)}.")
                     self._lock.release()
 
-                return result
+                if self.deep_copy:
+                    return copy.deepcopy(result)
+                else:
+                    return result
 
             except CacheException as e:
                 logging.debug(e)
